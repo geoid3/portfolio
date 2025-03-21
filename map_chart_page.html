@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte Toulouse âge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    <link rel="icon" type="image/x-icon" href= "images/boussole2.png">
+    
+    <script type="text/javascript" src="data/data.js"></script>
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .description {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+        .header {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .header p {
+            font-size: 1rem;
+            margin: 5px 0 0;
+        }
+        #chart-container {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .legend {
+            padding: 6px 8px;
+            line-height: 18px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            opacity: .9;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="container">
+                <h1>Carte des âges par quartier à Toulouse</h1>
+                <p>Un projet de cartographie interactive avec leaflet et chart.js</p>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 position-relative">
+                    <div id="map"></div>
+    
+                    <div id="chart-container" class="position-absolute top-0 end-0 mt-3 me-3 bg-white p-3 rounded shadow">
+                        <div id="chart"></div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="description">
+                        <h2>Description du projet</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p style="text-align: justify;">
+                                    Ce projet est une cartographie web interactive qui permet de visualiser et d’analyser des données démographiques par quartier à Toulouse à l’aide d’une carte choroplèthe. La carte, créée avec Leaflet et alimentée par les données de l'Open Data de Toulouse Métropole, est centrée sur Toulouse et affiche les quartiers sous forme de polygones colorés. La couleur de chaque quartier dépend du pourcentage de population âgée de 20 à 64 ans, avec des nuances allant du vert foncé (densité élevée) au vert pâle (densité faible). Lorsqu’un utilisateur clique sur un quartier, celui-ci est mis en évidence et un graphique en "donut", généré avec C3.js, apparaît pour montrer la répartition de la population par tranches d’âge (0-14 ans, 15-29 ans, etc.). Une légende en bas à droite de la carte explique la signification des couleurs, rendant l’outil facile à comprendre et à utiliser.
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="text-align: justify;">
+                                    L’objectif de ce projet est de fournir un outil visuel et interactif pour analyser rapidement les données démographiques d’une ville. Il est particulièrement utile pour identifier les zones où la population en âge de travailler est la plus concentrée et comparer la répartition des tranches d’âge entre quartiers.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="description">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Sources des données</h3>
+                        <ul>
+                            <li><a href="https://data.toulouse-metropole.fr/explore/dataset/recensement-population-2020-grands-quartiers-population/information/?location=12,43.60074,1.43284&basemap=jawg.streets" target="_blank">Open Data Toulouse Métropole</a></li>
+                            <li><a href="https://www.insee.fr/fr/statistiques/7704076#documentation" target="_blank">INSEE</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Tutoriels et ressources</h3>
+                        <ul>
+                            <li><a href="https://leafletjs.com/" target="_blank">Documentation officielle de Leaflet.js</a></li>
+                            <li><a href="https://getbootstrap.com/docs/5.3/getting-started/introduction/" target="_blank">Documentation de Bootstrap 5</a></li>
+                            <li><a href="https://neiugis.github.io/lab5/#overview" target="_blank">Tutoriel leaflet</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="footer">
+            <div class="container-fluid">
+                <div><i class="bi bi-compass"></i> Portfolio | 2025</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <script>
+        var selectedFeature = null;
+    
+        var map = L.map("map", { 
+            center: [43.6100002, 1.447981],
+            zoom: 11
+        });
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 20,
+            minZoom: 11
+        }).addTo(map);
+    
+        map.addControl(new L.Control.Fullscreen());
+        
+        function getColor(value) {
+            return value > 70 ? '#006d2c' :
+                value > 65 ? '#2ca25f' :
+                value > 60 ? '#66c2a4' :
+                value > 55 ? '#b2e2e2' :
+                '#edf8fb';
+        }
+    
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.pct_20_64),
+                weight: 2,
+                opacity: 0.9,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.8
+            };
+        }
+    
+        function makeChart(props) {
+            c3.generate({
+                bindto: '#chart',
+                size: {
+                    height: 200,
+                    width: 200
+                },
+                title: {
+                    text: props.lib_grd_quart,
+                },
+                data: {
+                    columns: [
+                        ['0-14 ans', props.p20_pop0014],
+                        ['15-29 ans', props.p20_pop1529],
+                        ['30-44 ans', props.p20_pop3044],
+                        ['45-59 ans', props.p20_pop4559],
+                        ['60-74 ans', props.p20_pop6074],
+                        ['75 ans et plus', props.p20_pop75p]
+                    ],
+                    type: 'donut',
+                },
+                donut: {
+                    label: {
+                        show: false
+                    },
+                    width: 30
+                },
+                color: {
+                    pattern: ["#EC7063", "#5DADE2", "#27AE60", "#F4D03F", "#E67E22", "#9B59B6"]
+                }
+            });
+        }
+    
+        function highlightFeature(e) {
+            if (selectedFeature) {
+                geojson.resetStyle(selectedFeature);
+            }
+    
+            selectedFeature = e.target;
+    
+            selectedFeature.setStyle({
+                weight: 5,
+                color: '#666',
+                fillOpacity: 0.7
+            });
+    
+            selectedFeature.bringToFront();
+    
+            makeChart(selectedFeature.feature.properties);
+            document.getElementById("chart-container").style.display = "block";
+        }
+    
+        function resetHighlight(e) {
+            if (selectedFeature === e.target) {
+                selectedFeature = null;
+                document.getElementById("chart-container").style.display = "none";
+            } else {
+                geojson.resetStyle(e.target);
+            }
+        }
+    
+        function onEachFeature(feature, layer) {
+            layer.on({
+                click: highlightFeature
+            });
+        }
+    
+        var geojson = L.geoJson(data, {
+            style: style,
+            onEachFeature: onEachFeature
+        }).addTo(map);
+    
+        var legend = L.control({ position: 'bottomright' });
+    
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'legend'),
+                grades = [50, 55, 60, 65, 70];
+    
+            div.innerHTML = '<b>Pourcentage de la population âgée <br> de 20 à 64 ans par quartier (en %) <br> 2020 <br></b>';
+    
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + getColor(grades[i] + 1) + '"></i>' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+    
+            return div;
+        };
+    
+        legend.addTo(map);
+
+    </script>
+</body>
+</html>

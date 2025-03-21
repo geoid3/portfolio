@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Population Japon</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    <link rel="icon" type="image/x-icon" href= "images/boussole2.png">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .description {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+        .header {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .header p {
+            font-size: 1rem;
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="container">
+                <h1>Une carte de la population par préfecture au Japon (2000)</h1>
+                <p>Un projet de cartographie avec leaflet.js</p>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div id="map"></div>
+                </div>
+                <div class="col-12">
+                    <div class="description">
+                        <h2>Description du projet</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p style="text-align: justify;">
+                                    Ce projet est une visualisation interactive de données géographiques utilisant la bibliothèque Leaflet. Il affiche une carte du Japon avec des couches de tuiles provenant de l'OpenStreetMap (fond de carte). La carte intègre un fichier GeoJSON qui contient des données démographiques par préfecture pour différentes années. Les données ont été nettoyées et traitées sur QGIS puis exportées au format GeoJSON (voir source des données). Des cercles proportionnels ont été créés pour représenter la population de chaque préfecture, avec des interactions au survol pour afficher des informations.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="text-align: justify;">
+                                    La taille des cercles varie en fonction de la population. De plus, des popups affichent le nom de la préfecture et le nombre d'habitants. Les cercles changent de couleur au survol pour améliorer l'expérience utilisateur. Ce projet sert d'exemple pratique pour la visualisation de données géospatiales avec Leaflet et GeoJSON.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="description">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Sources des Données</h3>
+                        <ul>
+                            <li><a href="https://www.e-stat.go.jp/en/stat-search/files?page=1&layout=datalist&toukei=00200524&tstat=000000090001&cycle=0&tclass1=000000090004&tclass2=000001051180&tclass3val=0" target="_blank">e-stat</a></li>
+                            <li><a href="https://www.gsi.go.jp/kankyochiri/gm_japan_e.html" target="_blank">GSI</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Tutoriels et Ressources</h3>
+                        <ul>
+                            <li><a href="https://leafletjs.com/" target="_blank">Documentation officielle de Leaflet.js</a></li>
+                            <li><a href="https://getbootstrap.com/docs/5.3/getting-started/introduction/" target="_blank">Documentation de Bootstrap 5</a></li>
+                            <li><a href="https://neiugis.github.io/lab7/" target="_blank">Tutoriel leaflet</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="footer">
+            <div class="container-fluid">
+                <div><i class="bi bi-compass"></i> Portfolio | 2025</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <script>
+        var map = L.map('map', {
+            center: [38.28, 133.9],
+            zoom: 5
+        });
+    
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 11,
+            minZoom: 4
+        }).addTo(map);
+    
+        fetch("data/pref_pop_00_20_pt.geojson")
+            .then(response => response.json())
+            .then(data => {
+                createPropSymbols(data);
+            })
+            .catch(error => console.error("Erreur de chargement du GeoJSON:", error));
+    
+        function createPropSymbols(data) {
+            let cities = L.geoJson(data, {
+                pointToLayer: function (feature, latlng) {
+                    let props = feature.properties;
+                    let radius = calcPropRadius(props['2000']); 
+                    let formattedPopulation = props['2000'].toLocaleString('fr-FR');
+                    let popupContent = `<strong>${props.pref}</strong><br> (2000): ${formattedPopulation} habitants`;
+    
+                    return L.circleMarker(latlng, {
+                        fillColor: "#14614b",
+                        color: '#14614b',
+                        weight: 2,
+                        fillOpacity: 0.5,
+                        radius: radius
+                    }).bindPopup(popupContent, { offset: new L.Point(0, -radius) })
+                    .on({
+                        mouseover: function () {
+                            this.openPopup();
+                            this.setStyle({ fillColor: 'orange' });
+                        },
+                        mouseout: function () {
+                            this.closePopup();
+                            this.setStyle({ fillColor: '#14614b' });
+                        }
+                    });
+                }
+            }).addTo(map);
+        }
+    
+        function calcPropRadius(attributeValue) {
+            let scaleFactor = 0.0001;  
+            let area = attributeValue * scaleFactor;
+            return Math.sqrt(area / Math.PI);
+        }
+    
+        map.addControl(new L.Control.Fullscreen());
+    </script>
+</body>
+</html>

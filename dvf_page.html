@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prix moyen m² Nouvelle-Aquitaine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    <link rel="icon" type="image/x-icon" href= "images/boussole2.png">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .description {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            margin-top: auto;
+        }
+        .header {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .header p {
+            font-size: 1rem;
+            margin: 5px 0 0;
+        }
+        .legend {
+            padding: 6px 8px;
+            line-height: 18px;
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="container">
+                <h1>Prix moyen du m² par commune en Nouvelle-Aquitaine</h1>
+                <p>Un projet de cartographie interactive</p>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div id="map"></div>
+                </div>
+                <div class="col-12">
+                    <div class="description">
+                        <h2>Description du projet</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p style="text-align: justify;">
+                                    Ce projet consiste en la création d'une carte interactive utilisant la bibliothèque Leaflet pour visualiser les prix moyens au mètre carré des communes. Les données proviennent de la base "Demandes de valeurs foncières géolocalisées" (DVF) pour les années 2019 à 2024. Les données ont été traitées en R grâce au script de Mericksay & Demoraes. Les données sont chargées à partir d'un fichier TopoJSON, puis stylisées en fonction des prix au m². Chaque commune est colorée selon une échelle de couleurs, allant du vert au rouge, pour représenter les différentes fourchettes de prix. Des popups interactifs fournissent des informations sur chaque commune, notamment le nom et le prix moyen au m².                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p style="text-align: justify;">
+                                    Le projet inclut également une légende pour aider les utilisateurs à interpréter les couleurs sur la carte. Des fonctionnalités interactives telles que le survol des communes pour les mettre en évidence et l'affichage des informations détaillées via des popups améliorent l'expérience utilisateur. La carte utilise des tuiles OpenStreetMap comme fond de carte et intègre un contrôle de géocodage pour faciliter la recherche de localisations spécifiques.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="description">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Sources des données</h3>
+                        <ul>
+                            <li><a href="https://www.data.gouv.fr/fr/datasets/5cc1b94a634f4165e96436c1/" target="_blank">DVF géolocalisées</a></li>
+                            <li><a href="https://www.ign.fr/" target="_blank">Shapefile des communes</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Tutoriels et ressources</h3>
+                        <ul>
+                            <li><a href="https://leafletjs.com/" target="_blank">Documentation officielle de Leaflet.js</a></li>
+                            <li><a href="https://getbootstrap.com/docs/5.3/getting-started/introduction/" target="_blank">Documentation de Bootstrap 5</a></li>
+                            <li><a href="https://htmlpreview.github.io/?https://github.com/ESO-Rennes/Analyse-Donnees-DVF/blob/main/ScriptDVF1.html" target="_blank">Tutoriel de Boris Mericskay et Florent Demoraes pour traiter la donnée DVF</a></li>
+                            <li><a href="https://github.com/perliedman/leaflet-control-geocoder" target="_blank">Ressource pour le géocodage</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="footer">
+            <div class="container-fluid">
+                <div><i class="bi bi-compass"></i> Portfolio | 2025</div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <script type="text/javascript">
+        var map = L.map('map', {
+            center: [44.8124093, -0.3989794],
+            zoom: 11
+        });
+
+        var geojson;
+
+        function getColor(value) {
+            return value > 4050 ? '#d7191c' :
+                value > 2635 ? '#fdae61' :
+                value > 1785 ? '#ffffc0' :
+                value > 1280 ? '#a6d96a' :
+                    '#1a9641';
+        }
+
+        function style(feature) {
+            var prixM2 = feature.properties && feature.properties.Prixm2Moyen ? feature.properties.Prixm2Moyen : 0;
+            return {
+                fillColor: getColor(prixM2),
+                weight: 1.5,
+                opacity: 1,
+                color: 'gray',
+                dashArray: "3",
+                fillOpacity: 0.7
+            };
+        }
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 20,
+            minZoom: 10
+        }).addTo(map);
+        L.Control.geocoder().addTo(map);
+
+        map.addControl(new L.Control.Fullscreen());
+
+        fetch('data/dvf1924_simp.topojson')
+            .then(response => response.json())
+            .then(data => {
+                console.log("TopoJSON data loaded:", data);
+
+                if (!data.objects || !data.objects.data) {
+                    console.error("Objet 'data' non trouvé dans le fichier TopoJSON. Objets disponibles :", Object.keys(data.objects));
+                    return;
+                }
+
+                var geojsonData = topojson.feature(data, data.objects.data);
+                console.log("GeoJSON data converted:", geojsonData);
+
+                geojson = L.geoJson(geojsonData, {
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+            })
+            .catch(error => {
+                console.error("Error loading or parsing TopoJSON file:", error);
+            });
+
+        function highlightFeature(e) {
+            var feature = e.target;
+            feature.setStyle({
+                weight: 5,
+                color: '#666',
+                fillOpacity: 0.7
+            });
+
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                feature.bringToFront();
+            }
+        }
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+            });
+
+            if (feature.properties) {
+                layer.bindPopup(
+                    '<h3 style="font-size:18px; font-weight:bold; color:#333;">' + (feature.properties.NOM || 'Inconnu') + '</h3>' +
+                    '<p style="color:black; font-size:16px;">' + 'Prix moyen au m² : ' + (feature.properties.Prixm2Moyen || 'N/A') + '</p>'
+                );
+            } else {
+                layer.bindPopup("Propriétés manquantes");
+            }
+        }
+
+        var legend = L.control({ position: 'bottomright' });
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'legend'),
+                grades = [450, 1280, 1785, 2635, 4050];
+
+            div.innerHTML = '<b>Prix moyen du m² par commune <br> 2019-2024 <br></b>';
+
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + getColor(grades[i] + 1) + '"></i>' +
+                    grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+            }
+
+            return div;
+        };
+        legend.addTo(map);
+    </script>
+</body>
+</html>
